@@ -1148,6 +1148,7 @@ function remEditMode(){
 // ════════════════════════════════════════════
 window.addEventListener('message',function(ev){
   var d=ev.data;if(!d||!d.t)return;
+  if(d.type==='load_html'&&d.html){loadPage(d.html);return;}
   if(d.t==='dbl'){requestTextEdit();return;}
   if(d.t==='desel'){clearSel();return;}
   if(d.t==='tap'){
