@@ -467,7 +467,7 @@ input[type=range].rng.r::-webkit-slider-thumb{background:var(--red)}
   </div>
   <div class="sp"></div>
   <button class="tbtn ghost" onclick="triggerOpen()" style="margin-right:6px">Open</button>
-  <button class="tbtn solid" onclick="doExport()">Export</button>
+  <button class="tbtn solid" onclick="doPublish()">Publish</button>
 </div>
 
 <!-- STATUS STRIP -->
@@ -536,7 +536,7 @@ input[type=range].rng.r::-webkit-slider-thumb{background:var(--red)}
   <button class="bn" onclick="triggerOpen()"><i>📂</i>Open</button>
   <button class="bn" id="modeBtn" onclick="toggleMode()"><i>✏️</i><span id="modeLbl">Edit</span></button>
   <button class="bn" onclick="showS('blockListSheet')"><i>☰</i>Blocks</button>
-  <button class="bn actk" onclick="doExport()"><i>💾</i>Export</button>
+  <button class="bn actk" onclick="doPublish()"><i>💾</i>Export</button>
   <button class="bn" id="ub" onclick="undo()" disabled><i>↩</i>Undo</button>
   <button class="bn" id="rb" onclick="redo()" disabled><i>↪</i>Redo</button>
 </div>
@@ -2087,7 +2087,12 @@ function uuB(){
 // ════════════════════════════════════════════
 //  EXPORT
 // ════════════════════════════════════════════
-function doExport(){var h=getHTML();if(!h||h.length<50)return toast('Nothing to export');document.getElementById('exportCode').value=h;openMo('exportModal');}
+function doPublish(){
+  var h = getHTML();
+  if(!h || h.length < 50) return toast('Nothing to publish');
+  toast('⏳ Publishing...');
+  window.parent.postMessage({ type: 'publish_html', html: h }, '*');
+}
 function copyExp(){navigator.clipboard.writeText(document.getElementById('exportCode').value).then(function(){toast('📎 Copied');});}
 function dlHTML(){var h=document.getElementById('exportCode').value;var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([h],{type:'text/html'}));a.download='orfeas-studio.html';a.click();toast('💾 Downloaded');}
 
@@ -2274,7 +2279,7 @@ document.addEventListener('keydown',function(e){
   if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
   if(e.metaKey||e.ctrlKey){
     if(e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();}
-    if(e.key.toLowerCase()==='s'){e.preventDefault();doExport();}
+    if(e.key.toLowerCase()==='s'){e.preventDefault();doPublish();}
     if(e.key.toLowerCase()==='e'){e.preventDefault();toggleMode();}
   }
   if(e.key==='Escape'){clearSel();moving=false;document.getElementById('moveOverlay').classList.remove('active');}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 
 interface Version {
@@ -20,7 +20,10 @@ interface Client {
 type Tab = "editor" | "versions";
 
 export default function EditorPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
   const router = useRouter();
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -56,11 +59,15 @@ export default function EditorPage() {
   }, [supabase, router]);
 
   useEffect(() => {
-    function handleMessage(event: MessageEvent) {
-      if (event.data?.type === "html_update" && event.data?.html) {
-        setCurrentHtml(event.data.html);
-      }
+  function handleMessage(event: MessageEvent) {
+    if (event.data?.type === "html_update" && event.data?.html) {
+      setCurrentHtml(event.data.html);
     }
+    if (event.data?.type === "publish_html" && event.data?.html) {
+      setCurrentHtml(event.data.html);
+      handlePublish();
+    }
+  }
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
