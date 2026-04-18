@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Strada — Artisan Pizza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&amp;family=Montserrat:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #7A6330;
+    --cream: #F5EDD8;
+    --cream-dim: #BFB49A;
+    --black: #0A0A0A;
+    --black-mid: #111111;
+    --black-light: #1A1A1A;
+    --black-card: #141414;
+    --red-deep: #6B1A1A;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Montserrat', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: var(--sans);
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  @keyframes os-fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes os-slideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes os-slideLeft {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes os-lineGrow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  @keyframes os-shimmer {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes os-rotateIn {
+    from { opacity: 0; transform: rotate(-6deg) scale(0.92); }
+    to { opacity: 1; transform: rotate(0deg) scale(1); }
+  }
+
+  .animate { opacity: 0; }
+  .animate.visible { animation: os-slideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  .animate-left.visible { animation: os-slideLeft 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  .animate-fade.visible { animation: os-fadeIn 1s ease forwards; }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 4rem;
+    background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, transparent 100%);
+    backdrop-filter: blur(4px);
+  }
+
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-decoration: none;
+    font-style: italic;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream-dim);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  .nav-reserve {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--gold);
+    border: none;
+    padding: 0.7rem 1.6rem;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+  }
+
+  .nav-reserve:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* HERO */
+  section[data-block="hero"] {
+    position: relative;
+    height: 100vh;
+    min-height: 700px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.28);
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(10,10,10,0.85) 40%, transparent 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 4rem;
+    max-width: 700px;
+    animation: os-fadeIn 1.2s ease 0.2s both;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    animation: os-lineGrow 0.8s ease 0.5s both;
+    transform-origin: left;
+  }
+
+  .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(4rem, 8vw, 7.5rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    color: var(--cream);
+    margin-bottom: 0.2rem;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-subtitle {
+    font-family: var(--serif);
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--cream-dim);
+    margin: 1.2rem 0 2.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-cta-group {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+  }
+
+  .btn-primary {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--gold);
+    border: none;
+    padding: 1rem 2.5rem;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+  .btn-ghost {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--cream);
+    background: transparent;
+    border: 1px solid rgba(197,168,76,0.4);
+    padding: 1rem 2.5rem;
+    cursor: pointer;
+    transition: border-color 0.3s, color 0.3s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    animation: os-shimmer 2.5s ease infinite;
+  }
+
+  .hero-scroll span {
+    font-size: 0.5rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+  }
+
+  /* STORY */
+  section[data-block="story"] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 85vh;
+  }
+
+  .story-image-side {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .story-image-side img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.75) saturate(0.8);
+    transition: transform 0.8s ease;
+  }
+
+  .story-image-side:hover img { transform: scale(1.04); }
+
+  .story-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 60%, var(--black-mid) 100%);
+  }
+
+  .story-text-side {
+    background: var(--black-mid);
+    padding: 8rem 5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .section-label {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.8rem;
+  }
+
+  .story-text-side h2 {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 4vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--cream);
+    margin-bottom: 1.5rem;
+  }
+
+  .story-text-side h2 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .story-text-side p {
+    font-size: 0.88rem;
+    line-height: 1.9;
+    color: var(--cream-dim);
+    max-width: 420px;
+    margin-bottom: 1rem;
+  }
+
+  .gold-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 2rem 0;
+    transform-origin: left;
+    animation: os-lineGrow 0.8s ease forwards;
+  }
+
+  .story-stat-row {
+    display: flex;
+    gap: 3rem;
+    margin-top: 2.5rem;
+  }
+
+  .story-stat p:first-child {
+    font-family: var(--serif);
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .story-stat p:last-child {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream-dim);
+    margin-top: 0.3rem;
+  }
+
+  /* MENU TEASER */
+  section[data-block="menu"] {
+    background: var(--black);
+    padding: 8rem 4rem;
+  }
+
+  .menu-header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  .menu-header h2 {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 5vw, 5rem);
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.05;
+  }
+
+  .menu-header h2 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .menu-header p {
+    font-size: 0.85rem;
+    color: var(--cream-dim);
+    margin-top: 1rem;
+    letter-spacing: 0.05em;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .menu-card {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .menu-card img {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+    filter: brightness(0.45) saturate(0.7);
+    transition: filter 0.5s ease, transform 0.5s ease;
+  }
+
+  .menu-card:hover img {
+    filter: brightness(0.6) saturate(0.9);
+    transform: scale(1.05);
+  }
+
+  .menu-card-content {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 2.5rem 2rem;
+    background: linear-gradient(transparent, rgba(10,10,10,0.9));
+  }
+
+  .menu-card-tag {
+    font-size: 0.5rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .menu-card h3 {
+    font-family: var(--serif);
+    font-size: 1.7rem;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+  }
+
+  .menu-card p {
+    font-size: 0.75rem;
+    color: var(--cream-dim);
+    line-height: 1.6;
+  }
+
+  .menu-card-price {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    color: var(--gold);
+    margin-top: 0.8rem;
+    font-style: italic;
+  }
+
+  .menu-card-border {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(201,168,76,0);
+    transition: border-color 0.4s ease;
+    pointer-events: none;
+  }
+
+  .menu-card:hover .menu-card-border { border-color: rgba(201,168,76,0.35); }
+
+  .menu-cta {
+    text-align: center;
+    margin-top: 4rem;
+  }
+
+  /* ATMOSPHERE */
+  section[data-block="atmosphere"] {
+    background: var(--black-mid);
+    padding: 8rem 4rem;
+  }
+
+  .atmosphere-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .atmosphere-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4rem;
+  }
+
+  .atmosphere-header h2 {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.1;
+  }
+
+  .atmosphere-header h2 em { font-style: italic; color: var(--gold); }
+
+  .atmosphere-header p {
+    max-width: 300px;
+    font-size: 0.8rem;
+    color: var(--cream-dim);
+    line-height: 1.8;
+    text-align: right;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 300px 300px;
+    gap: 4px;
+  }
+
+  .gallery-item {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .gallery-item.tall { grid-row: span 2; }
+
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.6) saturate(0.75);
+    transition: filter 0.5s, transform 0.5s;
+  }
+
+  .gallery-item:hover img {
+    filter: brightness(0.8) saturate(1);
+    transform: scale(1.03);
+  }
+
+  /* INGREDIENTS */
+  section[data-block="ingredients"] {
+    background: var(--black);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 70vh;
+    overflow: hidden;
+  }
+
+  .ingredients-text {
+    padding: 7rem 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .ingredients-text h2 {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 3.5vw, 3.5rem);
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  .ingredients-text h2 em { font-style: italic; color: var(--gold); }
+
+  .ingredients-text p {
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--cream-dim);
+    max-width: 440px;
+    margin-bottom: 1rem;
+  }
+
+  .ingredient-list {
+    list-style: none;
+    margin-top: 2rem;
+  }
+
+  .ingredient-list li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    color: var(--cream-dim);
+  }
+
+  .ingredient-list li::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 4px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .ingredient-list li span {
+    color: var(--cream);
+    font-weight: 400;
+  }
+
+  .ingredients-image {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ingredients-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.5) saturate(0.8);
+  }
+
+  .ingredients-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--black) 0%, transparent 40%);
+  }
+
+  /* RESERVATION */
+  section[data-block="reservation"] {
+    background: var(--black-light);
+    padding: 9rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .reservation-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--serif);
+    font-size: clamp(10rem, 20vw, 18rem);
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(201,168,76,0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -0.03em;
+    z-index: 0;
+  }
+
+  .reservation-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .reservation-inner h2 {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 5vw, 5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--cream);
+    margin-bottom: 1rem;
+  }
+
+  .reservation-inner h2 em { font-style: italic; color: var(--gold); }
+
+  .reservation-inner p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--cream-dim);
+    margin-bottom: 3rem;
+  }
+
+  .reservation-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-field label {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-field input,
+  .form-field select {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.2);
+    color: var(--cream);
+    padding: 0.9rem 1rem;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.3s;
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+
+  .form-field input:focus,
+  .form-field select:focus { border-color: var(--gold); }
+
+  .form-field select option { background: var(--black-light); }
+
+  .form-full { grid-column: span 2; }
+
+  .btn-reserve {
+    width: 100%;
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--gold);
+    border: none;
+    padding: 1.2rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background 0.3s, transform 0.2s;
+  }
+
+  .btn-reserve:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+  /* TESTIMONIALS */
+  section[data-block="testimonials"] {
+    background: var(--black);
+    padding: 8rem 4rem;
+  }
+
+  .testimonials-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .testimonials-header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  .testimonials-header h2 {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 300;
+    color: var(--cream);
+  }
+
+  .testimonials-header h2 em { font-style: italic; color: var(--gold); }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .testimonial-card {
+    background: var(--black-card);
+    padding: 3rem 2.5rem;
+    border: 1px solid rgba(201,168,76,0.08);
+    transition: border-color 0.4s;
+  }
+
+  .testimonial-card:hover { border-color: rgba(201,168,76,0.25); }
+
+  .testimonial-stars {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 1.5rem;
+  }
+
+  .star {
+    color: var(--gold);
+    font-size: 0.7rem;
+  }
+
+  .testimonial-card blockquote {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.7;
+    color: var(--cream);
+    margin-bottom: 2rem;
+  }
+
+  .testimonial-author {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  /* FOOTER */
+  footer[data-block="footer"] {
+    background: var(--black-mid);
+    border-top: 1px solid rgba(201,168,76,0.15);
+    padding: 6rem 4rem 3rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 5rem;
+  }
+
+  .footer-brand .logo {
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 1.2rem;
+    text-decoration: none;
+  }
+
+  .footer-brand p {
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: var(--cream-dim);
+    max-width: 280px;
+  }
+
+  .footer-col h4 {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+
+  .footer-col ul { list-style: none; }
+
+  .footer-col ul li {
+    margin-bottom: 0.7rem;
+  }
+
+  .footer-col ul li a {
+    font-size: 0.78rem;
+    color: var(--cream-dim);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .footer-col ul li a:hover { color: var(--gold); }
+
+  .footer-col address {
+    font-style: normal;
+    font-size: 0.78rem;
+    line-height: 1.9;
+    color: var(--cream-dim);
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 2.5rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .footer-bottom p {
+    font-size: 0.65rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.08em;
+  }
+
+  .footer-social {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .footer-social a {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream-dim);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .footer-social a:hover { color: var(--gold); }
+
+  @media (max-width: 900px) {
+    nav { padding: 1.5rem 2rem; }
+    .nav-links { display: none; }
+    .hero-content { padding: 0 2rem; }
+    section[data-block="story"] { grid-template-columns: 1fr; }
+    .story-image-side { height: 400px; }
+    .menu-grid { grid-template-columns: 1fr; }
+    .menu-card img { height: 300px; }
+    section[data-block="ingredients"] { grid-template-columns: 1fr; }
+    .ingredients-image { height: 400px; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .gallery-item.tall { grid-row: span 1; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .reservation-form { grid-template-columns: 1fr; }
+    .form-full { grid-column: span 1; }
+    .atmosphere-header { flex-direction: column; gap: 1.5rem; }
+    .atmosphere-header p { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">La puta</a>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#story">Our Story</a></li>
+    <li><a href="#atmosphere">Atmosphere</a></li>
+    <li><a href="#reservation">Reserve</a></li>
+  </ul>
+  <button class="nav-reserve" onclick="document.getElementById('reservation').scrollIntoView({behavior:'smooth'})">Reserve a Table</button>
+</nav>
+
+<section data-block="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Est. Milano, 1987</p>
+    <h1 class="hero-title">Where<br>Pizza<br><em>Becomes</em><br>Poetry</h1>
+    <p class="hero-subtitle">Handcrafted artisan pies, aged wines &amp; unforgettable evenings</p>
+    <div class="hero-cta-group">
+      <a href="#menu" class="btn-primary">Explore the Menu</a>
+      <a href="#reservation" class="btn-ghost">Reserve a Table</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span>Discover</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<section data-block="story" id="story">
+  <div class="story-image-side">
+    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&amp;q=80" alt="Restaurant interior">
+    <div class="story-image-overlay"></div>
+  </div>
+  <div class="story-text-side">
+    <p class="section-label animate visible" style="animation-delay: 0s;">Our Heritage</p>
+    <h2 class="animate visible" style="animation-delay: 0.1s;">A Story<br>Told in <em>Dough</em><br>&amp; Flame</h2>
+    <div class="gold-divider"></div>
+    <p class="animate" style="animation-delay: 0.2s;">Born in the cobblestoned streets of Milan, La Strada carries a singular obsession: that great pizza is not fast food — it is slow art. Each base is fermented for 72 hours. Each topping is sourced from the same Italian producers our founder Enzo Caruso shook hands with in 1987.</p>
+    <p class="animate" style="animation-delay: 0.3s;">We brought that tradition to the heart of the city, and we've never compromised a single ingredient since.</p>
+    <div class="story-stat-row">
+      <div class="story-stat animate" style="animation-delay: 0s;">
+        <p>72h</p>
+        <p>Cold Fermented Dough</p>
+      </div>
+      <div class="story-stat animate" style="animation-delay: 0.1s;">
+        <p>38°</p>
+        <p>Antique Wood Oven</p>
+      </div>
+      <div class="story-stat animate" style="animation-delay: 0.2s;">
+        <p>100%</p>
+        <p>Italian Ingredients</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-block="menu" id="menu">
+  <div class="menu-header">
+    <p class="section-label animate" style="animation-delay: 0.3s;">Signature Creations</p>
+    <h2 class="animate" style="animation-delay: 0s;">The <em>Art</em> of the Pie</h2>
+    <p class="animate" style="animation-delay: 0.1s;">Every pizza tells a story of its origin. Here are a few of ours.</p>
+  </div>
+  <div class="menu-grid">
+    <div class="menu-card animate" style="animation-delay: 0.2s;">
+      <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&amp;q=80" alt="Margherita pizza">
+      <div class="menu-card-content">
+        <p class="menu-card-tag">Classico</p>
+        <h3>La Regina</h3>
+        <p>San Marzano DOP, fior di latte, fresh basil, Sicilian olive oil</p>
+        <p class="menu-card-price">€18</p>
+      </div>
+      <div class="menu-card-border"></div>
+    </div>
+    <div class="menu-card animate" style="animation-delay: 0.3s;">
+      <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&amp;q=80" alt="Truffle pizza">
+      <div class="menu-card-content">
+        <p class="menu-card-tag">Signature</p>
+        <h3>Tartufo Nero</h3>
+        <p>Black truffle cream, taleggio, prosciutto crudo, aged parmesan</p>
+        <p class="menu-card-price">€34</p>
+      </div>
+      <div class="menu-card-border"></div>
+    </div>
+    <div class="menu-card animate" style="animation-delay: 0s;">
+      <img src="https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?w=800&amp;q=80" alt="Burrata pizza">
+      <div class="menu-card-content">
+        <p class="menu-card-tag">Stagionale</p>
+        <h3>Burrata d'Oro</h3>
+        <p>Fresh burrata, cherry tomatoes, basil oil, wild rocket, 10-year balsamic</p>
+        <p class="menu-card-price">€26</p>
+      </div>
+      <div class="menu-card-border"></div>
+    </div>
+  </div>
+  <div class="menu-cta">
+    <a href="#" class="btn-ghost">View Full Menu</a>
+  </div>
+</section>
+
+<section data-block="atmosphere" id="atmosphere">
+  <div class="atmosphere-inner">
+    <div class="atmosphere-header">
+      <div>
+        <p class="section-label animate" style="animation-delay: 0.1s;">The Space</p>
+        <h2 class="animate" style="animation-delay: 0.2s;">An <em>Atmosphere</em><br>Like No Other</h2>
+      </div>
+      <p class="animate" style="animation-delay: 0.3s;">Candlelit tables, hand-plastered walls, the scent of woodsmoke — La Strada is not just dinner. It is an evening you will linger over long after the last glass.</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item tall animate" style="animation-delay: 0s;">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&amp;q=80" alt="Restaurant dining room">
+      </div>
+      <div class="gallery-item animate" style="animation-delay: 0.1s;">
+        <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&amp;q=80" alt="Wood fired oven">
+      </div>
+      <div class="gallery-item animate" style="animation-delay: 0.2s;">
+        <img src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&amp;q=80" alt="Wine selection">
+      </div>
+      <div class="gallery-item animate" style="animation-delay: 0.3s;">
+        <img src="https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=800&amp;q=80" alt="Italian ingredients">
+      </div>
+      <div class="gallery-item animate" style="animation-delay: 0s;">
+        <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=800&amp;q=80" alt="Bar area">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-block="ingredients">
+  <div class="ingredients-text">
+    <p class="section-label animate" style="animation-delay: 0.1s;">The Philosophy</p>
+    <h2 class="animate" style="animation-delay: 0.2s;">Only the<br><em>Finest</em> Shall<br>Touch Our Dough</h2>
+    <p class="animate" style="animation-delay: 0.3s;">We believe great pizza begins not at the oven, but at the source. Every ingredient is selected by hand, imported weekly, and stored with obsessive care.</p>
+    <ul class="ingredient-list">
+      <li><span>Caputo 00 Flour</span> — Milled in Naples since 1924</li>
+      <li><span>San Marzano Tomatoes</span> — DOP certified, Campania</li>
+      <li><span>Fior di Latte</span> — Whole-milk mozzarella, Agerola</li>
+      <li><span>Olive Oil</span> — Cold-pressed, Nocellara del Belice</li>
+      <li><span>Black Truffle</span> — Seasonal, Norcia, Umbria</li>
+      <li><span>Prosciutto di Parma</span> — 24-month aged, PDO</li>
+    </ul>
+  </div>
+  <div class="ingredients-image">
+    <img src="https://images.unsplash.com/photo-1506354666786-959d6d497f1a?w=800&amp;q=80" alt="Fresh ingredients">
+    <div class="ingredients-image-overlay"></div>
+  </div>
+</section>
+
+<section data-block="testimonials">
+  <div class="testimonials-inner">
+    <div class="testimonials-header">
+      <p class="section-label animate" style="animation-delay: 0s;">Guest Words</p>
+      <h2 class="animate" style="animation-delay: 0.1s;">Moments <em>Remembered</em></h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card animate" style="animation-delay: 0.2s;">
+        <div class="testimonial-stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <blockquote>"The Tartufo Nero is the single greatest pizza I have ever eaten. I've dined across Italy and this rivals anything in Naples."</blockquote>
+        <p class="testimonial-author">— Marco V., Milano</p>
+      </div>
+      <div class="testimonial-card animate" style="animation-delay: 0.3s;">
+        <div class="testimonial-stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <blockquote>"The atmosphere is exactly what a luxury dinner should feel like. Dark, intimate, unhurried. And the wine list is extraordinary."</blockquote>
+        <p class="testimonial-author">— Isabelle R., Paris</p>
+      </div>
+      <div class="testimonial-card animate" style="animation-delay: 0s;">
+        <div class="testimonial-stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <blockquote>"We celebrated our anniversary here and the staff made us feel like royalty. The dough — you can taste the time and love that went into it."</blockquote>
+        <p class="testimonial-author">— Thomas &amp; Anna K., London</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-block="reservation" id="reservation">
+  <div class="reservation-bg-text" aria-hidden="true">La Strada</div>
+  <div class="reservation-inner">
+    <p class="section-label animate" style="animation-delay: 0.1s;">Dine With Us</p>
+    <h2 class="animate" style="animation-delay: 0.2s;">Reserve Your<br><em>Table</em></h2>
+    <p class="animate" style="animation-delay: 0.3s;">We seat a limited number of guests each evening to ensure every table receives our full attention. Book ahead to avoid disappointment.</p>
+    <div class="reservation-form animate" style="animation-delay: 0s;">
+      <div class="form-field">
+        <label for="res-name">Full Name</label>
+        <input type="text" id="res-name" placeholder="Enzo Caruso">
+      </div>
+      <div class="form-field">
+        <label for="res-email">Email Address</label>
+        <input type="email" id="res-email" placeholder="enzo@email.com">
+      </div>
+      <div class="form-field">
+        <label for="res-date">Date</label>
+        <input type="date" id="res-date">
+      </div>
+      <div class="form-field">
+        <label for="res-time">Preferred Time</label>
+        <select id="res-time">
+          <option value="">Select time</option>
+          <option>19:00</option>
+          <option>19:30</option>
+          <option>20:00</option>
+          <option>20:30</option>
+          <option>21:00</option>
+          <option>21:30</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="res-guests">Number of Guests</label>
+        <select id="res-guests">
+          <option>2 Guests</option>
+          <option>3 Guests</option>
+          <option>4 Guests</option>
+          <option>5 Guests</option>
+          <option>6+ Guests</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="res-occasion">Occasion</label>
+        <select id="res-occasion">
+          <option value="">Select occasion</option>
+          <option>Anniversary</option>
+          <option>Birthday</option>
+          <option>Business Dinner</option>
+          <option>Date Night</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-field form-full">
+        <label for="res-notes">Special Requests</label>
+        <input type="text" id="res-notes" placeholder="Allergies, dietary preferences, celebrations...">
+      </div>
+    </div>
+    <button class="btn-reserve animate" style="animation-delay: 0.1s;">Confirm Reservation</button>
+  </div>
+</section>
+
+<footer data-block="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="logo">La Strada</a>
+      <p>A celebration of Italian tradition, artisan craft, and the quiet luxury of a meal done exactly right. Open Tuesday through Sunday, from 18:00.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="#story">Our Story</a></li>
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="#atmosphere">Atmosphere</a></li>
+        <li><a href="#reservation">Reservations</a></li>
+        <li><a href="#">Private Dining</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Hours</h4>
+      <ul>
+        <li><a href="#">Tue – Fri: 18:00 – 23:00</a></li>
+        <li><a href="#">Sat: 12:00 – 23:30</a></li>
+        <li><a href="#">Sun: 12:00 – 22:00</a></li>
+        <li><a href="#">Monday: Closed</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Find Us</h4>
+      <address>
+        Via della Seta 14<br>
+        20121 Milano, Italy<br><br>
+        +39 02 8734 5500<br>
+        hello@lastrada.it
+      </address>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 La Strada Ristorante. All rights reserved. Demo site — not a real establishment.</p>
+    <div class="footer-social">
+      <a href="#">Instagram</a>
+      <a href="#">Facebook</a>
+      <a href="#">TripAdvisor</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.animate').forEach(el => observer.observe(el));
+
+  document.querySelectorAll('.animate').forEach((el, i) => {
+    el.style.animationDelay = (i % 4) * 0.1 + 's';
+  });
+</script>
+
+
+
+</body></html>
