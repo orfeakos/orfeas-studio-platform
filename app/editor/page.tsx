@@ -21,11 +21,13 @@ type Tab = "editor" | "versions";
 
 export default function EditorPage() {
   const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   const router = useRouter();
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const clientRef = useRef<Client | null>(null);
+  const currentHtmlRef = useRef<string>("");
 
   const [client, setClient] = useState<Client | null>(null);
   const [currentHtml, setCurrentHtml] = useState<string>("");
@@ -52,36 +54,33 @@ export default function EditorPage() {
       if (error || !data) { setLoading(false); return; }
 
       setClient(data);
+      clientRef.current = data;
       setCurrentHtml(data.site_html || "");
+      currentHtmlRef.current = data.site_html || "";
       setLoading(false);
     }
     loadClient();
-  }, [supabase, router]);
+  }, []);
 
   useEffect(() => {
-  function handleMessage(event: MessageEvent) {
-    if (event.data?.type === "html_update" && event.data?.html) {
-      setCurrentHtml(event.data.html);
+    function handleMessage(event: MessageEvent) {
+      if (event.data?.type === "html_update" && event.data?.html) {
+        setCurrentHtml(event.data.html);
+        currentHtmlRef.current = event.data.html;
+      }
+      if (event.data?.type === "publish_html" && event.data?.html) {
+        currentHtmlRef.current = event.data.html;
+        setCurrentHtml(event.data.html);
+        publishWithHtml(event.data.html);
+      }
     }
-    if (event.data?.type === "publish_html" && event.data?.html) {
-      setCurrentHtml(event.data.html);
-      handlePublish();
-    }
-  }
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
-  const handleIframeLoad = useCallback(() => {
-    if (iframeRef.current && currentHtml) {
-      iframeRef.current.contentWindow?.postMessage(
-        { type: "load_html", html: currentHtml }, "*"
-      );
-    }
-  }, [currentHtml]);
-
-  async function handlePublish() {
-    if (!client || !currentHtml) return;
+  async function publishWithHtml(html: string) {
+    const c = clientRef.current;
+    if (!c) return;
     setPublishing(true);
     setPublishStatus("idle");
 
@@ -89,14 +88,13 @@ export default function EditorPage() {
       const res = await fetch("/api/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clientId: client.id, html: currentHtml }),
+        body: JSON.stringify({ clientId: c.id, html }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Publish failed");
 
       setPublishStatus("success");
       setPublishMessage(`✓ Pushed to ${data.repo}`);
-      if (activeTab === "versions") fetchVersions();
     } catch (err: unknown) {
       setPublishStatus("error");
       setPublishMessage(err instanceof Error ? err.message : "Unknown error");
@@ -106,10 +104,23 @@ export default function EditorPage() {
     }
   }
 
+  async function handlePublish() {
+    publishWithHtml(currentHtmlRef.current);
+  }
+
+  const handleIframeLoad = useCallback(() => {
+    if (iframeRef.current && currentHtmlRef.current) {
+      iframeRef.current.contentWindow?.postMessage(
+        { type: "load_html", html: currentHtmlRef.current }, "*"
+      );
+    }
+  }, []);
+
   async function fetchVersions() {
-    if (!client) return;
+    const c = clientRef.current;
+    if (!c) return;
     setLoadingVersions(true);
-    const res = await fetch(`/api/versions?clientId=${client.id}`);
+    const res = await fetch(`/api/versions?clientId=${c.id}`);
     const data = await res.json();
     setVersions(data.versions || []);
     setLoadingVersions(false);
@@ -128,6 +139,7 @@ export default function EditorPage() {
 
     if (data.html) {
       setCurrentHtml(data.html);
+      currentHtmlRef.current = data.html;
       setActiveTab("editor");
       setTimeout(() => {
         iframeRef.current?.contentWindow?.postMessage(
