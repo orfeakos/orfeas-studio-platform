@@ -8,10 +8,7 @@ const supabase = createClient(
 
 export async function GET(req: NextRequest) {
   const clientId = req.nextUrl.searchParams.get("clientId");
-
-  if (!clientId) {
-    return NextResponse.json({ error: "Missing clientId" }, { status: 400 });
-  }
+  if (!clientId) return NextResponse.json({ error: "Missing clientId" }, { status: 400 });
 
   const { data, error } = await supabase
     .from("versions")
@@ -20,19 +17,13 @@ export async function GET(req: NextRequest) {
     .order("created_at", { ascending: false })
     .limit(20);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ versions: data });
 }
 
 export async function POST(req: NextRequest) {
   const { versionId } = await req.json();
-
-  if (!versionId) {
-    return NextResponse.json({ error: "Missing versionId" }, { status: 400 });
-  }
+  if (!versionId) return NextResponse.json({ error: "Missing versionId" }, { status: 400 });
 
   const { data, error } = await supabase
     .from("versions")
@@ -40,9 +31,32 @@ export async function POST(req: NextRequest) {
     .eq("id", versionId)
     .single();
 
-  if (error || !data) {
-    return NextResponse.json({ error: "Version not found" }, { status: 404 });
-  }
-
+  if (error || !data) return NextResponse.json({ error: "Version not found" }, { status: 404 });
   return NextResponse.json({ html: data.html, label: data.label });
+}
+
+export async function PATCH(req: NextRequest) {
+  const { versionId, label } = await req.json();
+  if (!versionId || !label) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+
+  const { error } = await supabase
+    .from("versions")
+    .update({ label })
+    .eq("id", versionId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
+}
+
+export async function DELETE(req: NextRequest) {
+  const { versionId } = await req.json();
+  if (!versionId) return NextResponse.json({ error: "Missing versionId" }, { status: 400 });
+
+  const { error } = await supabase
+    .from("versions")
+    .delete()
+    .eq("id", versionId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
 }

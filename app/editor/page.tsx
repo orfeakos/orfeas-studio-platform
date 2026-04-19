@@ -39,6 +39,7 @@ export default function EditorPage() {
   const [loadingVersions, setLoadingVersions] = useState(false);
   const [restoringVersion, setRestoringVersion] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editingLabel, setEditingLabel] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadClient() {
@@ -92,7 +93,6 @@ export default function EditorPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Publish failed");
-
       setPublishStatus("success");
       setPublishMessage(`✓ Pushed to ${data.repo}`);
     } catch (err: unknown) {
@@ -148,6 +148,27 @@ export default function EditorPage() {
       }, 300);
     }
     setRestoringVersion(null);
+  }
+
+  async function handleRename(versionId: string, newLabel: string, oldLabel: string) {
+    if (!newLabel.trim() || newLabel === oldLabel) { setEditingLabel(null); return; }
+    await fetch("/api/versions", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ versionId, label: newLabel.trim() }),
+    });
+    setVersions(prev => prev.map(v => v.id === versionId ? { ...v, label: newLabel.trim() } : v));
+    setEditingLabel(null);
+  }
+
+  async function handleDelete(versionId: string, label: string) {
+    if (!confirm(`Delete "${label}"? This cannot be undone.`)) return;
+    await fetch("/api/versions", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ versionId }),
+    });
+    setVersions(prev => prev.filter(v => v.id !== versionId));
   }
 
   async function handleLogout() {
@@ -240,16 +261,45 @@ export default function EditorPage() {
                 <p style={{ color:"#333", fontSize:12, letterSpacing:"0.05em" }}>No versions yet — publish your first version.</p>
               ) : (
                 <div style={{ display:"flex", flexDirection:"column", gap:8, maxWidth:560 }}>
-                  {versions.map(v => (
+                  {versions.map((v, index) => (
                     <div key={v.id} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 18px", background:"#141414", border:"1px solid #1f1f1f", borderRadius:8 }}>
-                      <div>
-                        <div style={{ fontSize:13, color:"#ccc", marginBottom:4 }}>{v.label}</div>
+                      <div style={{ flex:1, marginRight:12 }}>
+                        {editingLabel === v.id ? (
+                          <input
+                            autoFocus
+                            defaultValue={v.label}
+                            onBlur={(e) => handleRename(v.id, e.target.value, v.label)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") e.currentTarget.blur();
+                              if (e.key === "Escape") setEditingLabel(null);
+                            }}
+                            style={{ background:"#1f1f1f", border:"1px solid #7c6af7", borderRadius:4, padding:"3px 8px", color:"#fff", fontSize:13, fontFamily:"inherit", width:"100%" }}
+                          />
+                        ) : (
+                          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
+                            <div style={{ fontSize:13, color:"#ccc" }}>{v.label}</div>
+                            {index === versions.length - 1 && (
+                              <span style={{ fontSize:9, padding:"2px 6px", background:"#1a2a1a", color:"#4ade80", border:"1px solid #2d7a4a", borderRadius:3, letterSpacing:"0.08em" }}>ORIGINAL</span>
+                            )}
+                          </div>
+                        )}
                         <div style={{ fontSize:10, color:"#444", letterSpacing:"0.05em" }}>{new Date(v.created_at).toLocaleString("el-GR")}</div>
                       </div>
-                      <button onClick={() => handleRestore(v.id, v.label)} disabled={restoringVersion === v.id}
-                        style={{ padding:"6px 14px", background:"transparent", border:"1px solid #2a2a2a", borderRadius:5, color:"#7c6af7", fontFamily:"inherit", fontSize:10, letterSpacing:"0.08em", textTransform:"uppercase", cursor:"pointer" }}>
-                        {restoringVersion === v.id ? "Restoring..." : "Restore"}
-                      </button>
+
+                      <div style={{ display:"flex", gap:6 }}>
+                        <button onClick={() => setEditingLabel(v.id)}
+                          style={{ padding:"5px 10px", background:"transparent", border:"1px solid #2a2a2a", borderRadius:5, color:"#888", fontFamily:"inherit", fontSize:10, cursor:"pointer" }}
+                          title="Rename">✏</button>
+                        <button onClick={() => handleRestore(v.id, v.label)} disabled={restoringVersion === v.id}
+                          style={{ padding:"6px 14px", background:"transparent", border:"1px solid #2a2a2a", borderRadius:5, color:"#7c6af7", fontFamily:"inherit", fontSize:10, letterSpacing:"0.08em", textTransform:"uppercase", cursor:"pointer" }}>
+                          {restoringVersion === v.id ? "..." : "Restore"}
+                        </button>
+                        {index !== versions.length - 1 && (
+                          <button onClick={() => handleDelete(v.id, v.label)}
+                            style={{ padding:"5px 10px", background:"transparent", border:"1px solid #2a2a2a", borderRadius:5, color:"#f87171", fontFamily:"inherit", fontSize:10, cursor:"pointer" }}
+                            title="Delete">✕</button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
